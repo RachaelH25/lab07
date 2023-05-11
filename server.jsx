@@ -7,21 +7,23 @@ app.use(cors());
 
 const data = require("./data/weather.json");
 
-function findWeather() {
-    // const result= data.filter((weather) => weather."" == "")
-    return result;
-}
-
 app.get("/", (request, response) => {
-    response.json("This is the root");
+    response.json("This is the root route.");
 });
 
 app.get("/weather", (request, response) => {
-    let dataToReturn = data;
-    if (request.query.lat) {
-        dataToReturn = findWeather(request.query.lat);
-    }
-    response.json(dataToReturn);
+    const { lat, lon, searchQuery } = request.query;
+    // find will stop looking with the first it finds but filter finds all of the options and gives it in an array.
+    const city = data.find((item) => {
+        return item.city_name === searchQuery;
+    });
+    const forecasts = [];
+    city.data.forEach((day) => {
+        const fc = { date: day.valid_date, description: day.weather.description };
+        forecasts.push(fc);
+    });
+
+    response.json(forecasts);
 });
 
-app.listen(PORT, () => console.log(`App is runninh on PORT ${PORT}`));
+app.listen(PORT, () => console.log(`App is running on PORT ${PORT}`));
