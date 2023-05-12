@@ -1,15 +1,15 @@
 const express = require("express");
 const cors = require("cors");
+const axios = require("axios");
 require("dotenv").config();
 const PORT = process.env.PORT || 8081;
 const app = express();
 app.use(cors());
-const axios = require("axios");
 
 const data = require("./data/weather.json");
 
 app.get("/", (request, response) => {
-    response.json("This is the root route.");
+    response.status(200).json("This is the root route.");
 });
 
 app.get("/weather", async (request, response) => {
@@ -17,7 +17,7 @@ app.get("/weather", async (request, response) => {
     // find will stop looking with the first it finds but filter finds all of the options and gives it in an array.
     const forecasts = [];
     try {
-        const API = `https://api.weatherbit.io/v2.0/forecast/daily?key=${process.env.WEATHER_API_KEY}&lat=${data.lat},${data.lon}`;
+        const API = `https://api.weatherbit.io/v2.0/forecast/daily?key=${process.env.WEATHER_API_KEY}&city=${searchQuery}`;
         const res = await axios.get(API);
 
         res.data.data.forEach((day) => {

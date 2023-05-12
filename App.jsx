@@ -1,7 +1,7 @@
 import "./Reset.css";
 import "./App.css";
-import { useState } from "react";
 import axios from "axios";
+import { useState } from "react";
 
 function App() {
     const [searchQuery, setSearchQuery] = useState("");
@@ -18,11 +18,12 @@ function App() {
     async function getLocation() {
         try {
             const API = `https://eu1.locationiq.com/v1/search?key=${process.env.REACT_APP_API_KEY}&q=${searchQuery}&format=json`;
-            console.log(API);
+            // console.log(API);
             const res = await axios.get(API);
-            setLocation(res.data[0]);
-            handleMap(res.data[0]);
-            getWeather(res.data[0]);
+            const newLocation = res.data[0];
+            setLocation(newLocation);
+            handleMap(newLocation);
+            getWeather(newLocation);
             setApiError("");
         } catch (error) {
             console.log(error);
@@ -33,10 +34,15 @@ function App() {
         }
     }
 
-    async function getWeather(data) {
+    async function handleMap(newLocation) {
+        const API = `https://maps.locationiq.com/v3/staticmap?key=${process.env.REACT_APP_API_KEY}&center=${newLocation.lat},${newLocation.lon}&zoom=12`;
+        setMapImg(API);
+    }
+
+    async function getWeather(newLocation) {
         try {
             // const API = `https://localhost:8081/weather?searchQuery=${searchQuery}&lat=${data.lat}&lon=${data.lon}`;
-            const API = `https://api.weatherbit.io/v2.0/forecast/daily?key=${process.env.WEATHER_API_KEY}&lat=${data.lat},${data.lon}`;
+            const API = `https://api.weatherbit.io/v2.0/forecast/daily?key=${process.env.WEATHER_API_KEY}&lat=${newLocation.lat},${newLocation.lon}`;
             const res = await axios.get(API);
             console.log(res.data);
             setWeather(res.data);
@@ -44,11 +50,6 @@ function App() {
             console.log(error);
             setWeather([]);
         }
-    }
-
-    function handleMap(data) {
-        const API = `https://maps.locationiq.com/v3/staticmap?key=${process.env.REACT_APP_API_KEY}&center=${data.lat},${data.lon}&zoom=12`;
-        setMapImg(API);
     }
 
     return (
